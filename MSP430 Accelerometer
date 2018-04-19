@@ -20,11 +20,6 @@ int main(void)
         }
         ADC12CTL0 |= ADC12SC;                   //begins the sample and conversion for ADC12CTL0
         
-        if(ADC12MEM1>0x0808){                   //when the board is tilted to the left
-          
-        else if(ADC12MEM1<0x0798){              //when the board is tilted to the right
-            
-        else{                                           //when the board is flat
-        }
-    }
+        int tilt= ADC12MEM1;   
+        return tilt;
 }
