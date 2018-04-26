@@ -1,0 +1,79 @@
+#include <msp430fr6989.h>
+#include <SPI.h>
+#define HX8353E                             //selects expansion board LCD
+#if defined(ENERGIA)                        // LaunchPad MSP430, Stellaris and Tiva, Experimeter Board FR5739 specific
+    #include "Energia.h"
+#else // error
+    #error Platform not defined
+#endif
+
+#include <LCD_screen.h>                     //sets up all header files for the LCD screen
+#include <LCD_screen_font.h>
+#include <LCD_utilities.h>
+#include <Screen_HX8353E.h>
+#include <Terminal12e.h>
+#include <Terminal6e.h>
+#include <Terminal8e.h>
+Screen_HX8353E myScreen;                    //names the screen
+
+#if defined(HX8353E)                        // Educational BoosterPack MKII
+    #if defined(__MSP430F5529__) || defined(__CC2650__)
+        #define ROWS 32 // max 80
+        #define COLS 32 // max 60
+    #elif defined(__LM4F120H5QR__) || defined(__TM4C123GH6PM__) || defined(__CC3200R1MXRGCR__)
+        #define ROWS 64 // max 80
+        #define COLS 64 // max 60
+    #elif defined(__TM4C1294NCPDT__) || defined(__TM4C1294XNCZAD__) || defined(__MSP432P401R__)
+        #define ROWS 128 // max 128
+        #define COLS 128 // max 128
+    #else
+        #error Board not supported
+    #endif
+#else                                                                           // general case
+    #define ROWS 80 // max 80
+    #define COLS 60 // max 60
+#endif
+
+const int joystickSel = 5;                  // the number of the joystick select pin
+const int joystickX = 2;                    // the number of the joystick X-axis analog
+const int joystickY =  26;                  // the number of the joystick Y-axis analog
+
+int joystickSelState = 0;                   // variable for reading the joystick sel status
+int joystickXState, joystickYState ;
+
+
+int main(void)
+{
+    WDTCTL = WDTPW | WDTHOLD;           `   // stop watch dog timer
+    P6SEL |=BIT1 | BIT2 | BIT3;             //lines 16-26 set up the accelerometer
+    P6DIR |= BIT0;
+    P6OUT |= BIT0;
+    ADC12MCTL1 |=ADC12INCH_1;
+    ADC12CTL0 |= ADC12ON;
+    ADC12CTL1 |= ADC12CSTARTADD_1;
+    ADC12CTL1 |= ADC12SHP;
+    ADC12CTL1 |= ADC12SHS_0;
+    ADC12CTL1 |= ADC12SSEL_0;
+    ADC12CTL1 |= ADC12CONSEQ_0;
+    ADC12CTL0 |= ADC12ENC | ADC12SC;
+    
+    pinMode(joystickSel, INPUT_PULLUP);    // initialize the pushbutton pin as an input:
+    
+    
+    while(1){
+        //run program
+    }
+}
+
+void readJoystick(){
+    joystickXState = analogRead(joystickX);
+    joystickYState = analogRead(joystickY);
+    joystickSelState = digitalRead(joystickSel);
+}
+
+void readAccel(){
+    if(!(ADC12CTL1 & ADC12BUSY)){           //if the MSP430 is busy, do nothing
+        ADC12MEM1;
+    }
+    ADC12CTL0 |= ADC12SC;                   //begins the sample and conversion for ADC12CTL0
+}
