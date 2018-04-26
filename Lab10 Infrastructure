@@ -1,3 +1,6 @@
+//Here is a GREAT link to help with anything boosterpack related:
+//https://embeddedcomputing.weebly.com/educational-boosterpack-mk-ii.html
+
 #include <msp430fr6989.h>
 #include <SPI.h>
 #define HX8353E                             //selects expansion board LCD
