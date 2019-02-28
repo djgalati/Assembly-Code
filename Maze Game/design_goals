@@ -1,0 +1,10 @@
+# we will add design goals here
+# goals are listed in order of priority
+
+- [ ] pre generated mazes
+- [ ] pre generated hole location on mazes
+- [ ] control movement with joystick
+- [ ] random generations of mazes on msp430
+- [ ] random generation of holes on mazes on msp430
+- [ ] control movement with accelerometer
+- [ ] different levels involving control method
