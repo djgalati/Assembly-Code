@@ -1,2 +1,2 @@
-# accelerometer
-includes the part of the program to roll the ball around via tilting the board
+# Assembly Code
+Code in this repo has been written to program microcontrollers such as the MSP430 and the 68K
