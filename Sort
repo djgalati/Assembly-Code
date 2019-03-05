@@ -1,0 +1,46 @@
+*-----------------------------------------------------------
+* Title      :LAB2
+* Written by :Bryson O'Niell & Domenico Galati
+* Date       :2/3/18
+* Description:Working code
+*-----------------------------------------------------------
+START:                  ; first instruction of program
+    ORG $420
+    DC.B 43,5,23,35,13,78,12,235,234,217,156,245,124,25,60,21,69,78,24,67 ;Generating random list
+    
+    ORG $400
+    DC.L $420 ;stores first and last numbers into $400 and $404
+    DC.L $433 ;stores first and last numbers into $400 and $404
+    
+    ORG $1000
+    MOVE.B #0,D6 ;our test variable to see if there are any swaps that occured during the last check
+    
+CHECK
+    MOVEA.L $400,A0 ;stores first address A0
+    MOVEA.L $404,A1 ;stores last address into A1
+    MOVE.B #0,D7 ;resets swap counters each time the list restarts
+REP  
+    MOVE.B (A0)+,D0 ;moves the current indexed number into D0
+    MOVE.B (A0),D1 ;;moves the second indexed number into D1
+       
+    CMP D0,D1 ;check to see if the first number is bigger than the second
+    BGE EXIT
+    
+    MOVE.B D0,D2 ;these 3 lines of code swap the data for being incorrectly placed
+    MOVE.B D1,D0 ;these 3 lines of code swap the data for being incorrectly placed
+    MOVE.B D2,D1 ;these 3 lines of code swap the data for being incorrectly placed
+    
+    ADD #1,D7 ;ADD 1 TO THE SWAP COUNTER
+    
+    MOVE.B D0,-(A0) ;moves the properly sorted number back into memory
+    MOVE.B (A0),(A0)+ ;moves the properly sorted number back into memory
+    MOVE.B D1,(A0) ;moves the properly sorted number back into memory
+EXIT
+
+    CMPA A1,A0 ;this checks to make sure we got through the list
+    BNE REP
+   
+    CMP D7,D6 ;this checks to make sure the list has made no swaps on its run
+    BNE CHECK
+    
+    END  $1000       ; last line of source
