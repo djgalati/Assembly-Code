@@ -1,0 +1,21 @@
+#include <msp430.h>
+#include <intrinsics.h>
+int main(void)
+{
+	WDTCTL = WDTPW | WDTHOLD;          	// stop watch dog timer
+	PM5CTL0 = 0xFFFE;
+	P1DIR |= BIT0;                     	// configure P1.0 as output
+	P1OUT |= BIT0;
+	TA0CTL = TA0CTL | TASSEL_1 | MC_1; 	//set up timer A1
+	TA0CCR0=16000;                     	//Sets the max timer value to the TA1CCR0 register
+	TA0CCTL0 = CCIE;
+	__enable_interrupt();
+	while(1){
+    	LPM3;
+	}
+}
+#pragma vector = TIMER0_A0_VECTOR
+__interrupt void TA1_ISR (void){
+	P1OUT ^= BIT0;
+	TA0CTL &=~TAIFG;
+}
