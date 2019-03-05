@@ -1,0 +1,17 @@
+#include <msp430.h>
+
+int main(void)
+{
+	WDTCTL = WDTPW | WDTHOLD;          	// stop watchdog timer
+	PM5CTL0 = 0xFFFE;
+	P1DIR |= BIT0;                     	// configure P1.0 as output
+	P1OUT |= BIT0;
+	TA1CTL = TA1CTL | TASSEL_1 | MC_1; 	//set up timer A1
+	TA1CCR0=16000;                     	//Sets the max timer value to the TA1CCR0 register
+	while(1){
+    	if(TA1CTL & TAIFG){
+        	P1OUT ^= BIT0;
+        	TA1CTL &= ~BIT0;
+    	}
+	}
+}
