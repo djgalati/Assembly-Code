@@ -1,0 +1,42 @@
+#include <msp430f5438a.h>
+int main(void)
+{
+	WDTCTL = WDTPW | WDTHOLD;   	// stop watchdog timer
+	P1DIR |= BIT0;                //configures P1.0  as an output
+	P1DIR |= BIT1;				        //configures P1.1 as an output
+	P1OUT |= BIT0;				        //^
+	P1OUT |= BIT1;				        //^
+	P2DIR &= BIT6;                //makes pin 6 an output
+	P2DIR &= BIT7;                //makes pin 7 an output
+	P2REN |= BIT6;				        //sets switch 1 as a pullup resistor
+	P2REN |= BIT7;				        //sets switch 2 as a pullup resistor
+	P2OUT |= BIT6;				        //^
+	P2OUT |= BIT7;				        //^ 
+  
+	TA1CTL = TA1CTL | TASSEL_1 | MC_1;			        //sets up timer A 1
+	TA1CCR0 = 32000;							                  //sets max timer count
+	while(1){
+   		if(TA1CTL & TAIFG){
+       		P1OUT ^= BIT0;               					  //Toggles LED 1 on 
+and off
+       		TA1CTL&=~BIT0;               					  //clears interupt flag
+   		}
+   		if((P2IN & BIT6)==0 & (TA1CCR0<64000)){     //s1=1
+       			P1OUT|=BIT1;                 				  //turns on LED2
+       			while((P2IN & BIT6)==0){}				      //While P2.6 = 0, the 
+clock is divided by 
+0.6666
+       			TA1CCR0=TA1CCR0/.6666;
+   		}
+   		else if((P2IN & BIT7)==0 & (TA1CCR0>2163)){ //if S2 = 1
+       			P1OUT|=BIT1;                 				  //turns on LED2
+       			while((P2IN & BIT7)==0){}				      //While P2.7 = 0, the 
+clock is multiplied 
+by 0.6666
+       			TA1CCR0=TA1CCR0*.6666;
+   		}
+   		else{
+       			P1OUT &= ~BIT1;              				  //turns off LED2
+   		}
+	}
+}
