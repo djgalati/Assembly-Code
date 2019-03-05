@@ -1,0 +1,50 @@
+#include <msp430f5438a.h>
+int main(void)
+{
+	WDTCTL = WDTPW | WDTHOLD;           	// stop watch dog timer
+	P6SEL |=BIT1 | BIT2 | BIT3;         	//lines 6-16set up the accelerometer
+	P6DIR |= BIT0;
+	P6OUT |= BIT0;
+	ADC12MCTL1 |=ADC12INCH_1;
+	ADC12CTL0 |= ADC12ON;
+	ADC12CTL1 |= ADC12CSTARTADD_1;
+	ADC12CTL1 |= ADC12SHP;
+	ADC12CTL1 |= ADC12SHS_0;
+	ADC12CTL1 |= ADC12SSEL_0;
+	ADC12CTL1 |= ADC12CONSEQ_0;
+	ADC12CTL0 |= ADC12ENC | ADC12SC;
+	P1DIR |= BIT0;                       	// configure P1.0 and P1.1 as output
+	P1DIR |= BIT1;
+	P1OUT |= BIT0;
+	P1OUT |= BIT1;
+	TA1CTL = TA1CTL | TASSEL_1 | MC_1;  	//set up timer A1
+	TA1CCR0=10000;                     		//Sets the max timer value to the TA1CCR0 
+register
+	while(1){
+    	if(!(ADC12CTL1 & ADC12BUSY)){
+        	ADC12MEM1;
+    	}
+    	ADC12CTL0 |= ADC12SC;          	 	//begins the sample and conversion for 
+ADC12CTL0
+    	if(ADC12MEM1>0x0808){         		//when the board is tilted to the left
+        	if(TA1CTL & TAIFG){
+            	P1OUT^=BIT0;           		//LED1 on
+            	TA1CTL &=~ BIT0;
+                    	}
+        	P1OUT &=~BIT1;              	//LED2 off
+        	TA1CCR0=TA1CCR0+(ADC12MEM1-0X07C8)*50;
+    	}
+    	else if(ADC12MEM1<0x0798){     		//when the board is tilted to the right
+        	if(TA1CTL & TAIFG){
+            	P1OUT^=BIT1;           		//LED2 on
+            	TA1CTL &=~ BIT0;
+        	}
+        	P1OUT &=~BIT0;           			//LED1 off
+        	TA1CCR0=TA1CCR0-(ADC12MEM1-0X07C8)*50;
+    	}
+    	else{                     		   	//when the board is flat
+        	P1OUT |= BIT1;           			//LED2 on
+        	P1OUT |= BIT0;           			//LED1 on
+    	}
+	}
+}
