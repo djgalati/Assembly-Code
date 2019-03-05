@@ -1,0 +1,19 @@
+#include <msp430f5438a.h>
+/**
+ * blink.c
+ */
+void main(void)
+{
+	WDTCTL = WDTPW | WDTHOLD;		// stop watchdog timer
+	P1DIR |= 0x01;				// configure P1.0 as output
+	TA1CTL = TA1CTL | TASSEL_2 | MC_1;
+	TA1CCR0 = 10000;
+
+	volatile unsigned int i;				// volatile to prevent optimization
+
+	while(1){
+	    if(TA1CCR0 <= TA1R){
+	        P1OUT ^= 0x01;
+	    }
+	}
+}
