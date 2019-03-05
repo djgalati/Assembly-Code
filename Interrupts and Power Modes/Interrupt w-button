@@ -1,0 +1,36 @@
+#include <msp430f5438a.h>
+
+int main(void)
+{
+    WDTCTL = WDTPW | WDTHOLD;	// stop watchdog timer
+    P1DIR |= BIT0;              			// configure P1.0 and P1.1 as output
+    P1DIR |= BIT1;				//^
+    P1OUT |= BIT0;				//^
+    P1OUT |= BIT1;				//^
+    P2DIR &= BIT6;				//makes pin 6 an output
+    P2DIR &= BIT7;				//makes pin 7 an output
+    P2REN |= BIT6;				//^
+    P2REN |= BIT7;				//^
+    P2OUT |= BIT6;				//^
+    P2OUT |= BIT7;				//^
+
+    TA1CTL = TA1CTL | TASSEL_1 | MC_1;      //sets up timer A 1 clock
+    TA1CCR0 = 30000;				//sets max number that the clock can 
+count to to 30,000
+
+    while(1){						//while true
+    	if(TA1CTL & TAIFG){
+     	P1OUT ^= BIT0;				//Toggles LED 1 on and off
+           	TA1CTL&=~BIT0;			//clears interrupt flag
+    	}
+if((P2IN & BIT6)==0){			//if switch 1 is pressed
+    		P1OUT|=BIT1;			//turns on LED2
+    	}
+    	else if((P2IN & BIT7)==0){			//if switch 2 is pressed
+     		P1OUT|=BIT1;			//turns on LED2
+     	}
+     	else{
+      		P1OUT &= ~BIT1;			//turns off LED2
+      	}
+    }
+}
