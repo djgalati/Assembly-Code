@@ -1,0 +1,59 @@
+#include <msp430.h>
+#include <driverlib.h>					 // Required for the LCD
+#include "myGpio.h" 					 // Required for the LCD
+#include "myClocks.h"				 // Required for the LCD
+#include "myLcd.h"					 // Required for the LCD
+int i=0; 							 // int to keep count
+char Name[17]= "DOMENICO GALATI  "; 		 //Char array storing my name
+int BattLev[7] = {4, 6, 7, 8, 9, 10, 11};			 // int array storing battery levels
+
+void main(void){
+WDTCTL = WDTPW | WDTHOLD; 			 // Watchdog timer stop
+
+// initialize LCD (next 4 lines)
+initGPIO(); 						
+initClocks(); 						
+myLCD_init();						
+myLCD_showSymbol(LCD_UPDATE, LCD_BRACKETS,0 );
+
+while(1){
+    myLCD_showChar( Name[0], 1 );			 //Next 6 lines display first 6 char in array
+    myLCD_showChar( Name[1], 2 );
+    myLCD_showChar( Name[2], 3 );
+    myLCD_showChar( Name[3], 4 );
+    myLCD_showChar( Name[4], 5 );
+    myLCD_showChar( Name[5], 6 );
+    myLCD_showSymbol(LCD_UPDATE, BattLev[i], 0 );  //updates battery symbol
+    char temp=Name[0];				 //next 18 line shift name array to the left      
+    Name[0]=Name[1];
+    Name[1]=Name[2];
+    Name[2]=Name[3];
+    Name[3]=Name[4];
+    Name[4]=Name[5];
+    Name[5]=Name[6];
+    Name[6]=Name[7];
+    Name[7]=Name[8];
+    Name[8]=Name[9];
+    Name[9]=Name[10];
+    Name[10]=Name[11];
+    Name[11]=Name[12];
+    Name[12]=Name[13];
+    Name[13]=Name[14];
+    Name[14]=Name[15];
+    Name[15]=Name[16];
+    Name[16]=temp;
+    __delay_cycles(2000000);				 //Short delay
+    if(i>=6){						//this is statement will reset the battery symbol once its “full”
+        i=1;
+        myLCD_showSymbol(LCD_CLEAR, BattLev[1], 0 );
+        myLCD_showSymbol(LCD_CLEAR, BattLev[2], 0 );
+        myLCD_showSymbol(LCD_CLEAR, BattLev[3], 0 );
+        myLCD_showSymbol(LCD_CLEAR, BattLev[4], 0 );
+        myLCD_showSymbol(LCD_CLEAR, BattLev[5], 0 );
+        myLCD_showSymbol(LCD_CLEAR, BattLev[6], 0 );
+    }
+    else if(i<6){						//increases count to keep track of battery symbol
+        i=i+1;
+    }
+}
+}
